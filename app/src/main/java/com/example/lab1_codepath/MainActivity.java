@@ -11,7 +11,7 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
-    // to get an instance of the database
+    // To get an instance of the database
     FlashcardDatabase flashcardDatabase;
     // List that holds the flashcard objects
     List<Flashcard> allFlashcards;
@@ -84,6 +84,21 @@ public class MainActivity extends AppCompatActivity {
                 flashcardDatabase.deleteCard(((TextView) findViewById(R.id.flashcard_question)).getText().toString());
                 // Update cards after deletion
                 allFlashcards = flashcardDatabase.getAllCards();
+                // Update index so it displays correctly when the next button is clicked
+                currentCardDisplayedIndex--;
+
+                // If there are no cards left in the database, display
+                // an 'empty' state by updating the question TextView to display "Add a card!"
+                if (allFlashcards.size() == 0) {
+                    ((TextView) findViewById(R.id.flashcard_question)).setText("Add a card!");
+                    ((TextView) findViewById(R.id.flashcard_answer)).setText("Add a card!");
+                }
+                // Else, display the previous card
+                else{
+                    // set the question and answer TextViews with data from the database
+                    ((TextView) findViewById(R.id.flashcard_question)).setText(allFlashcards.get(currentCardDisplayedIndex).getQuestion());
+                    ((TextView) findViewById(R.id.flashcard_answer)).setText(allFlashcards.get(currentCardDisplayedIndex).getAnswer());
+                }
             }
         });
 
