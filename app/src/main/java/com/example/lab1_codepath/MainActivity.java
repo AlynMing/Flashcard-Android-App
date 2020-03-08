@@ -7,12 +7,32 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import java.util.List;
+
 public class MainActivity extends AppCompatActivity {
+
+    // to get an instance of the database
+    FlashcardDatabase flashcardDatabase;
+    // List that holds the flashcard objects
+    List<Flashcard> allFlashcards;
+    // Index of the card to be displayed, starts at 0 (first card)
+    int currentCardDisplayedIndex = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        flashcardDatabase = new FlashcardDatabase(getApplicationContext());
+        // Access the cards
+        allFlashcards = flashcardDatabase.getAllCards();
+
+        // Check if the list of flashcards is empty
+        // If not, display a saved flashcard
+        if (allFlashcards != null && allFlashcards.size() > 0) {
+            ((TextView) findViewById(R.id.flashcard_question)).setText(allFlashcards.get(0).getQuestion());
+            ((TextView) findViewById(R.id.flashcard_answer)).setText(allFlashcards.get(0).getAnswer());
+        }
 
         findViewById(R.id.flashcard_question).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -39,6 +59,35 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        // Next button that changes flashcards
+        findViewById(R.id.nextButton).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // advance our pointer index so we can show the next card
+                currentCardDisplayedIndex++;
+
+                // make sure we don't get an IndexOutOfBoundsError if we are viewing the last indexed card in our list
+                if (currentCardDisplayedIndex > allFlashcards.size() - 1) {
+                    currentCardDisplayedIndex = 0;
+                }
+
+                // set the question and answer TextViews with data from the database
+                ((TextView) findViewById(R.id.flashcard_question)).setText(allFlashcards.get(currentCardDisplayedIndex).getQuestion());
+                ((TextView) findViewById(R.id.flashcard_answer)).setText(allFlashcards.get(currentCardDisplayedIndex).getAnswer());
+            }
+        });
+
+        // Button to delete flashcards
+        findViewById(R.id.deleteTrashButton).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                flashcardDatabase.deleteCard(((TextView) findViewById(R.id.flashcard_question)).getText().toString());
+                // Update cards after deletion
+                allFlashcards = flashcardDatabase.getAllCards();
+            }
+        });
+
+
     }
 
     @Override
@@ -49,6 +98,12 @@ public class MainActivity extends AppCompatActivity {
 
             ((TextView) findViewById(R.id.flashcard_question)).setText(question);
             ((TextView) findViewById(R.id.flashcard_answer)).setText(answer);
+
+            // We now need to save data into the database
+            // 'question' and 'answer' are the data extracted previously
+            flashcardDatabase.insertCard(new Flashcard(question, answer));
+            // Update list of flashcards
+            allFlashcards = flashcardDatabase.getAllCards();
         }
     }
 }
