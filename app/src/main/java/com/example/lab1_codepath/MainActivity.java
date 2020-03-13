@@ -29,9 +29,12 @@ public class MainActivity extends AppCompatActivity {
 
         // Check if the list of flashcards is empty
         // If not, display a saved flashcard
-        if (allFlashcards != null && allFlashcards.size() > 0) {
+        if (allFlashcards != null && allFlashcards.size() > 0) { // If there are flashcards
             ((TextView) findViewById(R.id.flashcard_question)).setText(allFlashcards.get(0).getQuestion());
             ((TextView) findViewById(R.id.flashcard_answer)).setText(allFlashcards.get(0).getAnswer());
+        }
+        else{
+
         }
 
         findViewById(R.id.flashcard_question).setOnClickListener(new View.OnClickListener() {
@@ -51,7 +54,7 @@ public class MainActivity extends AppCompatActivity {
         });
 
         // Navigate to the activity that will allow users to add a flash card
-        findViewById(R.id.myBtn).setOnClickListener(new View.OnClickListener() {
+        findViewById(R.id.addButton).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent toAddCard = new Intent(MainActivity.this, AddCardActivity.class);
@@ -63,8 +66,6 @@ public class MainActivity extends AppCompatActivity {
         findViewById(R.id.nextButton).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // Check to make sure there are flashcards
-                if (allFlashcards.size() > 0) {
                     // advance our pointer index so we can show the next card
                     currentCardDisplayedIndex++;
 
@@ -73,10 +74,11 @@ public class MainActivity extends AppCompatActivity {
                         currentCardDisplayedIndex = 0;
                     }
 
-                    // set the question and answer TextViews with data from the database
-                    ((TextView) findViewById(R.id.flashcard_question)).setText(allFlashcards.get(currentCardDisplayedIndex).getQuestion());
-                    ((TextView) findViewById(R.id.flashcard_answer)).setText(allFlashcards.get(currentCardDisplayedIndex).getAnswer());
-                }
+                    // If there are cards, set the question and answer TextViews with data from the database
+                    if(allFlashcards != null && allFlashcards.size() > 0) {
+                        ((TextView) findViewById(R.id.flashcard_question)).setText(allFlashcards.get(currentCardDisplayedIndex).getQuestion());
+                        ((TextView) findViewById(R.id.flashcard_answer)).setText(allFlashcards.get(currentCardDisplayedIndex).getAnswer());
+                    }
             }
         });
 
@@ -84,11 +86,16 @@ public class MainActivity extends AppCompatActivity {
         findViewById(R.id.deleteTrashButton).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                // Delete the current card
                 flashcardDatabase.deleteCard(((TextView) findViewById(R.id.flashcard_question)).getText().toString());
+                // Update the current card index
+                currentCardDisplayedIndex--;
+                // Make sure that the index does not go below 0
+                if (currentCardDisplayedIndex < 0){
+                    currentCardDisplayedIndex = 0;
+                }
                 // Update cards after deletion
                 allFlashcards = flashcardDatabase.getAllCards();
-                // Update index so it displays correctly when the next button is clicked
-                currentCardDisplayedIndex--;
 
                 // If there are no cards left in the database, display
                 // an 'empty' state by updating the question TextView to display "Add a card!"
