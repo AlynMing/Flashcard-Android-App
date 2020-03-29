@@ -4,7 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".AddCardActivity">
+    tools:context=".AddCardActivity"
+    android:background="#9fc7ff">
 
     <ImageView
         android:id="@+id/cancelButton"
@@ -12,8 +13,8 @@
         android:layout_height="100dp"
         android:layout_alignParentEnd="true"
         android:layout_alignParentBottom="true"
-        android:layout_marginEnd="3dp"
-        android:layout_marginBottom="3dp"
+        android:layout_marginEnd="25dp"
+        android:layout_marginBottom="25dp"
         android:src="@drawable/ic_cancel_button"
         android:layout_centerInParent="true" />
 
@@ -24,8 +25,9 @@
         android:layout_alignParentEnd="true"
         android:layout_alignParentBottom="true"
         android:layout_centerInParent="true"
-        android:layout_marginEnd="308dp"
-        android:layout_marginBottom="4dp"
+        android:layout_marginStart="25dp"
+        android:layout_marginEnd="284dp"
+        android:layout_marginBottom="25dp"
         android:src="@drawable/ic_save" />
 
     <EditText

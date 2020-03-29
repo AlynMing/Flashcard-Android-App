@@ -19,6 +19,7 @@ public class AddCardActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 finish();
+                overridePendingTransition(R.anim.left_in, R.anim.right_out);
             }
         });
 
@@ -31,6 +32,7 @@ public class AddCardActivity extends AppCompatActivity {
                 data.putExtra("answer", ((EditText) findViewById(R.id.answerEnter)).getText().toString()); // puts another string into the Intent, with the key as 'string2
                 setResult(RESULT_OK, data); // set result code and bundle data for response
                 finish(); // closes this activity and pass data to the original activity that launched this activity
+                overridePendingTransition(R.anim.left_in, R.anim.right_out);
             }
         });
     }

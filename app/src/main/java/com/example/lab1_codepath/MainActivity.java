@@ -1,11 +1,17 @@
 package com.example.lab1_codepath;
 
+import android.animation.Animator;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.view.ViewAnimationUtils;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
+
+import com.google.android.material.snackbar.Snackbar;
 
 import java.util.List;
 
@@ -17,6 +23,11 @@ public class MainActivity extends AppCompatActivity {
     List<Flashcard> allFlashcards;
     // Index of the card to be displayed, starts at 0 (first card)
     int currentCardDisplayedIndex = 0;
+    int camera_distance = 25000;
+
+    boolean isBlankString(String string) {
+        return string == null || string.trim().isEmpty();
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,22 +45,100 @@ public class MainActivity extends AppCompatActivity {
             ((TextView) findViewById(R.id.flashcard_answer)).setText(allFlashcards.get(0).getAnswer());
         }
         else{
-
+            ((TextView) findViewById(R.id.flashcard_question)).setText("Add a card!");
+            ((TextView) findViewById(R.id.flashcard_answer)).setText("Add a card!");
         }
+//        if (allFlashcards.size() > 0) {  // Only reveal answers if there are cards in the database
+//            findViewById(R.id.flashcard_question).setVisibility(View.VISIBLE);
+//            findViewById(R.id.flashcard_answer).setVisibility(View.INVISIBLE);
+//        }
 
         findViewById(R.id.flashcard_question).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                findViewById(R.id.flashcard_answer).setVisibility(View.VISIBLE);
-                findViewById(R.id.flashcard_question).setVisibility(View.INVISIBLE);
+                if (allFlashcards.size() > 0) {  // Only reveal answers if there are cards in the database
+                    //findViewById(R.id.flashcard_answer).setVisibility(View.VISIBLE);
+                    //findViewById(R.id.flashcard_question).setVisibility(View.INVISIBLE);
+
+                    // Add a reveal animation for when the answer is revealed
+                    final View answerSideView = findViewById(R.id.flashcard_answer);
+                    final View questionSideView = findViewById(R.id.flashcard_question);
+
+                    findViewById(R.id.flashcard_question).setCameraDistance(camera_distance);
+                    findViewById(R.id.flashcard_answer).setCameraDistance(camera_distance);
+                    questionSideView.animate()
+                            .rotationY(90)
+                            .setDuration(200)
+                            .withEndAction(
+                                    new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            questionSideView.setVisibility(View.INVISIBLE);
+                                            questionSideView.setRotationY(0);
+                                            findViewById(R.id.flashcard_answer).setVisibility(View.VISIBLE);
+                                            // second quarter turn
+                                            findViewById(R.id.flashcard_answer).setRotationY(-90);
+                                            findViewById(R.id.flashcard_answer).animate()
+                                                    .rotationY(0)
+                                                    .setDuration(200)
+                                                    .start();
+                                        }
+                                    }
+                            ).start();
+
+//                    // get the center for the clipping circle
+////                    int cx = answerSideView.getWidth() / 2;
+////                    int cy = answerSideView.getHeight() / 2;
+////
+////                    // get the final radius for the clipping circle
+////                    float finalRadius = (float) Math.hypot(cx, cy);
+////
+////                    // create the animator for this view (the start radius is zero)
+////                    Animator anim = ViewAnimationUtils.createCircularReveal(answerSideView, cx, cy, 0f, finalRadius);
+////
+////                    // hide the question and show the answer to prepare for playing the animation!
+////                    questionSideView.setVisibility(View.INVISIBLE);
+////                    answerSideView.setVisibility(View.VISIBLE);
+////
+////                    anim.setDuration(1000);
+////                    anim.start();
+
+                }
             }
         });
 
         findViewById(R.id.relativeLayout).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                findViewById(R.id.flashcard_question).setVisibility(View.VISIBLE);
-                findViewById(R.id.flashcard_answer).setVisibility(View.INVISIBLE);
+                if (allFlashcards.size() > 0 && findViewById(R.id.flashcard_answer).getVisibility() == View.VISIBLE){  // Only reveal answers if there are cards in the database
+                    //findViewById(R.id.flashcard_question).setVisibility(View.VISIBLE);
+                    //findViewById(R.id.flashcard_answer).setVisibility(View.INVISIBLE);
+
+                    final View answerSideView = findViewById(R.id.flashcard_answer);
+                    final View questionSideView = findViewById(R.id.flashcard_question);
+
+                    findViewById(R.id.flashcard_question).setCameraDistance(camera_distance);
+                    findViewById(R.id.flashcard_answer).setCameraDistance(camera_distance);
+                    answerSideView.animate()
+                            .rotationY(90)
+                            .setDuration(200)
+                            .withEndAction(
+                                    new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            answerSideView.setVisibility(View.INVISIBLE);
+                                            findViewById(R.id.flashcard_question).setVisibility(View.VISIBLE);
+                                            answerSideView.setRotationY(0);
+                                            // second quarter turn
+                                            findViewById(R.id.flashcard_question).setRotationY(-90);
+                                            findViewById(R.id.flashcard_question).animate()
+                                                    .rotationY(0)
+                                                    .setDuration(200)
+                                                    .start();
+                                        }
+                                    }
+                            ).start();
+                }
             }
         });
 
@@ -59,6 +148,7 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Intent toAddCard = new Intent(MainActivity.this, AddCardActivity.class);
                 MainActivity.this.startActivityForResult(toAddCard, 100);
+                overridePendingTransition(R.anim.right_in, R.anim.left_out);
             }
         });
 
@@ -66,19 +156,58 @@ public class MainActivity extends AppCompatActivity {
         findViewById(R.id.nextButton).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                    // advance our pointer index so we can show the next card
-                    currentCardDisplayedIndex++;
+                final Animation leftOutAnim = AnimationUtils.loadAnimation(v.getContext(), R.anim.left_out);
+                final Animation rightInAnim = AnimationUtils.loadAnimation(v.getContext(), R.anim.right_in);
 
-                    // make sure we don't get an IndexOutOfBoundsError if we are viewing the last indexed card in our list
-                    if (currentCardDisplayedIndex > allFlashcards.size() - 1) {
-                        currentCardDisplayedIndex = 0;
-                    }
+                // advance our pointer index so we can show the next card
+                currentCardDisplayedIndex++;
 
-                    // If there are cards, set the question and answer TextViews with data from the database
-                    if(allFlashcards != null && allFlashcards.size() > 0) {
-                        ((TextView) findViewById(R.id.flashcard_question)).setText(allFlashcards.get(currentCardDisplayedIndex).getQuestion());
-                        ((TextView) findViewById(R.id.flashcard_answer)).setText(allFlashcards.get(currentCardDisplayedIndex).getAnswer());
+                // make sure we don't get an IndexOutOfBoundsError if we are viewing the last indexed card in our list
+                if (currentCardDisplayedIndex > allFlashcards.size() - 1) {
+                    currentCardDisplayedIndex = 0;
+                }
+
+                leftOutAnim.setAnimationListener(new Animation.AnimationListener() {
+                    @Override
+                    public void onAnimationStart(Animation animation) {
+                        // this method is called when the animation first starts
+
                     }
+                    @Override
+                    public void onAnimationEnd(Animation animation) {
+                        // this method is called when the animation is finished playing
+                        // Check that there are flashcards in the database. If there are, play swiping animation on transition.
+                        if(allFlashcards.size() > 1) {
+                            ((TextView) findViewById(R.id.flashcard_question)).setText(allFlashcards.get(currentCardDisplayedIndex).getQuestion());
+                            ((TextView) findViewById(R.id.flashcard_answer)).setText(allFlashcards.get(currentCardDisplayedIndex).getAnswer());
+
+                            // Check if the question is already visible
+                            if (findViewById(R.id.flashcard_question).getVisibility() == View.VISIBLE){
+                                findViewById(R.id.flashcard_question).startAnimation(rightInAnim);
+                            }
+                            else{
+                                findViewById(R.id.flashcard_question).setVisibility(View.VISIBLE);
+                                findViewById(R.id.flashcard_answer).setVisibility(View.INVISIBLE);
+                                findViewById(R.id.flashcard_question).startAnimation(rightInAnim);
+                            }
+                        }
+                    }
+                    @Override
+                    public void onAnimationRepeat(Animation animation) {
+                        // we don't need to worry about this method
+                    }
+                });
+
+                // If there are cards in the database, play swiping animation
+                if(allFlashcards.size() > 1) {
+                    if (findViewById(R.id.flashcard_question).getVisibility() == View.VISIBLE){
+                        findViewById(R.id.flashcard_question).startAnimation(leftOutAnim);
+                    }
+                    else{
+                        findViewById(R.id.flashcard_answer).startAnimation(leftOutAnim);
+                    }
+                }
+
             }
         });
 
@@ -120,15 +249,33 @@ public class MainActivity extends AppCompatActivity {
         if (requestCode == 100 & data != null){ // this 100 needs to match the 100 we used when we called startActivityForResult!
             String question = data.getExtras().getString("question"); // 'string1' needs to match the key we used when we put the string in the Intent
             String answer = data.getExtras().getString("answer");
+            // If the user gives inputs for question and answer:
+            if (!isBlankString(question) && !isBlankString(answer)) {
+                ((TextView) findViewById(R.id.flashcard_question)).setText(question);
+                ((TextView) findViewById(R.id.flashcard_answer)).setText(answer);
 
-            ((TextView) findViewById(R.id.flashcard_question)).setText(question);
-            ((TextView) findViewById(R.id.flashcard_answer)).setText(answer);
+                // We now need to save data into the database
+                // 'question' and 'answer' are the data extracted previously
+                flashcardDatabase.insertCard(new Flashcard(question, answer));
+                // Update currentCardDisplayedIndex
+                currentCardDisplayedIndex = allFlashcards.size();
+                // Update list of flashcards
+                allFlashcards = flashcardDatabase.getAllCards();
 
-            // We now need to save data into the database
-            // 'question' and 'answer' are the data extracted previously
-            flashcardDatabase.insertCard(new Flashcard(question, answer));
-            // Update list of flashcards
-            allFlashcards = flashcardDatabase.getAllCards();
+                // Snackbar message to show that card has been added
+                Snackbar.make(findViewById(R.id.flashcard_question),
+                        "Card successfully created.",
+                        Snackbar.LENGTH_SHORT)
+                        .show();
+            }
+            else{
+                // Snackbar message to show that card has not been added
+                Snackbar.make(findViewById(R.id.flashcard_question),
+                        "Error: Please enter a question and an answer.",
+                        Snackbar.LENGTH_SHORT)
+                        .show();
+            }
+
         }
     }
 }

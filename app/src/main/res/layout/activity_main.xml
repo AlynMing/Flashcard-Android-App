@@ -5,12 +5,16 @@
     android:id="@+id/relativeLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity">
+    tools:context=".MainActivity"
+    android:background="#9fc7ff">
 
     <TextView
         android:id="@+id/flashcard_question"
         android:layout_width="match_parent"
-        android:layout_height="200dp"
+        android:layout_height="250dp"
+        android:layout_above="@+id/nextButton"
+        android:layout_marginBottom="250dp"
+        android:background="@drawable/card_background"
         android:text="Who is the 44th President of the United States?"
         android:textAlignment="center"
         android:textSize="40sp" />
@@ -18,14 +22,15 @@
     <TextView
         android:id="@+id/flashcard_answer"
         android:layout_width="match_parent"
-        android:layout_height="200dp"
+        android:layout_height="250dp"
         android:layout_alignBottom="@+id/flashcard_question"
-        android:layout_marginTop="-203dp"
-        android:layout_marginBottom="-2dp"
+        android:layout_alignTop="@+id/flashcard_question"
+        android:layout_marginBottom="0dp"
         android:text="Barack Obama"
         android:textAlignment="center"
         android:textSize="40sp"
-        android:visibility="invisible" />
+        android:visibility="invisible"
+        android:background="@drawable/card_background" />
 
     <ImageView
         android:id="@+id/addButton"
@@ -33,29 +38,30 @@
         android:layout_height="100dp"
         android:layout_alignParentEnd="true"
         android:layout_alignParentBottom="true"
-        android:layout_marginEnd="3dp"
-        android:layout_marginBottom="3dp"
+        android:layout_marginEnd="25dp"
+        android:layout_marginBottom="25dp"
         android:src="@drawable/ic_plus_icon" />
 
     <ImageView
         android:id="@+id/nextButton"
         android:layout_width="100dp"
         android:layout_height="100dp"
-        android:layout_alignParentEnd="true"
         android:layout_alignParentBottom="true"
-        android:layout_marginEnd="3dp"
-        android:layout_marginBottom="202dp"
+        android:layout_marginStart="25dp"
+        android:layout_marginEnd="25dp"
+        android:layout_marginBottom="25dp"
+        android:layout_toStartOf="@+id/addButton"
+        android:layout_toEndOf="@+id/deleteTrashButton"
         android:src="@drawable/ic_next_button" />
 
     <ImageView
         android:id="@+id/deleteTrashButton"
         android:layout_width="100dp"
         android:layout_height="100dp"
-        android:layout_alignParentEnd="true"
+        android:layout_alignParentStart="true"
         android:layout_alignParentBottom="true"
-        android:layout_marginEnd="147dp"
-        android:layout_marginBottom="202dp"
+        android:layout_marginStart="25dp"
+        android:layout_marginEnd="3dp"
+        android:layout_marginBottom="25dp"
         android:src="@drawable/ic_trash_delete_button" />
-
-
 </RelativeLayout>
